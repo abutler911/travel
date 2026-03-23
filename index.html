@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travels — Andrew Butler</title>
+    <meta
+      name="description"
+      content="Places Andrew Butler has been. Countries visited, cities explored."
+    />
+
+    <!-- Leaflet -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ─── VARIABLES ─── */
+      :root {
+        --bg: #f7f4ef;
+        --bg-card: #ffffff;
+        --bg-elevated: #f0ece4;
+        --text-primary: #1a1714;
+        --text-secondary: #5a5650;
+        --text-muted: #9a9590;
+        --accent: #9b1c1c;
+        --accent-dim: rgba(155, 28, 28, 0.08);
+        --accent-mid: rgba(155, 28, 28, 0.25);
+        --accent-fill: rgba(155, 28, 28, 0.12);
+        --border: rgba(0, 0, 0, 0.08);
+        --border-bright: rgba(0, 0, 0, 0.14);
+        --shadow: 0 2px 24px rgba(0, 0, 0, 0.07);
+        --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
+        --serif: "Cormorant Garamond", Georgia, serif;
+        --mono: "JetBrains Mono", monospace;
+        --map-bg: #e8e4dc;
+        --map-water: #d4cfc6;
+        --map-visited: rgba(155, 28, 28, 0.18);
+        --map-visited-border: rgba(155, 28, 28, 0.5);
+      }
+
+      [data-theme="dark"] {
+        --bg: #0c0c0c;
+        --bg-card: #141414;
+        --bg-elevated: #1a1a1a;
+        --text-primary: #e8e4dc;
+        --text-secondary: #8a8680;
+        --text-muted: #4a4845;
+        --accent: #c0392b;
+        --accent-dim: rgba(192, 57, 43, 0.1);
+        --accent-mid: rgba(192, 57, 43, 0.3);
+        --accent-fill: rgba(192, 57, 43, 0.15);
+        --border: rgba(255, 255, 255, 0.07);
+        --border-bright: rgba(255, 255, 255, 0.12);
+        --shadow: 0 2px 24px rgba(0, 0, 0, 0.4);
+        --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.5);
+        --map-bg: #1a1a1a;
+        --map-water: #111111;
+        --map-visited: rgba(192, 57, 43, 0.2);
+        --map-visited-border: rgba(192, 57, 43, 0.6);
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--bg);
+        color: var(--text-primary);
+        font-family: var(--serif);
+        overflow-x: hidden;
+        transition:
+          background 0.4s,
+          color 0.4s;
+      }
+
+      body {
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+      ::selection {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      /* Grain */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.025;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 128px;
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 2px;
+      }
+
+      /* ─── NAV ─── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 1.4rem 5vw;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        transition: background 0.4s;
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .nav-back {
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.3s;
+      }
+
+      .nav-back:hover {
+        color: var(--accent);
+      }
+
+      .nav-sep {
+        width: 1px;
+        height: 14px;
+        background: var(--border-bright);
+      }
+
+      .nav-title {
+        font-family: var(--serif);
+        font-size: 1rem;
+        font-style: italic;
+        font-weight: 400;
+        color: var(--text-primary);
+        letter-spacing: 0.02em;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .theme-toggle {
+        background: none;
+        border: 1px solid var(--border-bright);
+        border-radius: 4px;
+        width: 34px;
+        height: 30px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        transition:
+          border-color 0.3s,
+          color 0.3s,
+          background 0.3s;
+      }
+
+      .theme-toggle:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-dim);
+      }
+
+      [data-theme="light"] .icon-moon {
+        display: block;
+      }
+      [data-theme="light"] .icon-sun {
+        display: none;
+      }
+      [data-theme="dark"] .icon-sun {
+        display: block;
+      }
+      [data-theme="dark"] .icon-moon {
+        display: none;
+      }
+
+      /* ─── HERO ─── */
+      .hero {
+        padding: 7rem 5vw 3rem;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .hero-label {
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .label-line {
+        display: inline-block;
+        width: 24px;
+        height: 1px;
+        background: var(--accent);
+      }
+
+      .hero-title {
+        font-family: var(--serif);
+        font-size: clamp(3rem, 7vw, 6rem);
+        font-weight: 300;
+        line-height: 0.95;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+      }
+
+      .hero-title em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .hero-sub {
+        font-family: var(--serif);
+        font-size: 1.05rem;
+        font-style: italic;
+        font-weight: 300;
+        color: var(--text-secondary);
+        max-width: 500px;
+        line-height: 1.7;
+      }
+
+      /* ─── STATS STRIP ─── */
+      .stats-strip {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        padding: 2rem 5vw;
+        max-width: 1400px;
+        margin: 0 auto;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex: 1;
+        min-width: 140px;
+        padding: 0.5rem 2rem 0.5rem 0;
+      }
+
+      .stat-num {
+        font-family: var(--serif);
+        font-size: 2.8rem;
+        font-weight: 300;
+        color: var(--accent);
+        line-height: 1;
+        letter-spacing: -0.02em;
+      }
+
+      .stat-label {
+        font-family: var(--mono);
+        font-size: 0.52rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        line-height: 1.4;
+      }
+
+      .stat-divider {
+        width: 1px;
+        height: 32px;
+        background: var(--border-bright);
+        flex-shrink: 0;
+        margin-right: 2rem;
+      }
+
+      /* ─── MAP ─── */
+      .map-wrap {
+        padding: 2rem 5vw 3rem;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      #map {
+        width: 100%;
+        height: 60vh;
+        min-height: 400px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        background: var(--map-bg);
+      }
+
+      /* ─── CITY LIST ─── */
+      .city-section {
+        padding: 3rem 5vw 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .city-section-label {
+        font-family: var(--mono);
+        font-size: 0.56rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .city-rule {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          var(--border-bright),
+          transparent
+        );
+      }
+
+      .continent-group {
+        margin-bottom: 2.5rem;
+      }
+
+      .continent-name {
+        font-family: var(--mono);
+        font-size: 0.52rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .city-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+      }
+
+      .city-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        transition:
+          border-color 0.25s,
+          background 0.25s;
+        cursor: default;
+      }
+
+      .city-item:hover {
+        border-color: var(--accent);
+        background: var(--accent-dim);
+      }
+
+      .city-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex-shrink: 0;
+      }
+
+      .city-name {
+        font-family: var(--serif);
+        font-size: 0.92rem;
+        font-weight: 400;
+        color: var(--text-primary);
+      }
+
+      .city-country {
+        font-family: var(--mono);
+        font-size: 0.48rem;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-left: auto;
+      }
+
+      /* ─── FOOTER ─── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 2.5rem 5vw;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .footer-name {
+        font-family: var(--serif);
+        font-size: 0.95rem;
+        font-style: italic;
+        color: var(--text-primary);
+      }
+
+      .footer-copy {
+        font-family: var(--mono);
+        font-size: 0.5rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      /* ─── LEAFLET OVERRIDES ─── */
+      .leaflet-container {
+        font-family: var(--serif);
+        background: var(--map-bg) !important;
+      }
+
+      .leaflet-popup-content-wrapper {
+        background: var(--bg-card);
+        border: 1px solid var(--border-bright);
+        border-radius: 6px;
+        box-shadow: var(--shadow-hover);
+        padding: 0;
+      }
+
+      .leaflet-popup-content {
+        margin: 0;
+        padding: 10px 14px;
+      }
+
+      .leaflet-popup-tip {
+        background: var(--bg-card);
+      }
+
+      .leaflet-popup-close-button {
+        color: var(--text-muted) !important;
+        font-size: 16px !important;
+        padding: 4px 6px !important;
+      }
+
+      .popup-city {
+        font-family: var(--serif);
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+      }
+
+      .popup-country {
+        font-family: var(--mono);
+        font-size: 0.52rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      /* Custom pin */
+      .custom-pin {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--accent, #9b1c1c);
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(155, 28, 28, 0.4);
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .custom-pin:hover {
+        transform: scale(1.4);
+      }
+
+      @media (max-width: 768px) {
+        .hero {
+          padding: 6rem 5vw 2rem;
+        }
+        #map {
+          height: 50vh;
+        }
+        .stat-divider {
+          display: none;
+        }
+        .stats-strip {
+          gap: 1rem;
+        }
+        footer {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Nav -->
+    <nav>
+      <div class="nav-left">
+        <a href="https://andrewfbutler.com" class="nav-back">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          andrewfbutler.com
+        </a>
+        <div class="nav-sep"></div>
+        <span class="nav-title">Travels</span>
+      </div>
+      <div class="nav-right">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg
+            class="icon-sun"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+            />
+          </svg>
+          <svg
+            class="icon-moon"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-label">
+        <span class="label-line"></span>
+        Andrew Butler
+      </div>
+      <h1 class="hero-title">Places I've<br /><em>Been.</em></h1>
+      <p class="hero-sub">
+        A life lived in motion. From East Africa to East Asia, South America to
+        Eastern Europe — collected over a lifetime of wandering with intent.
+      </p>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <div class="stat-item">
+        <span class="stat-num">22</span>
+        <span class="stat-label">Countries<br />Visited</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">21</span>
+        <span class="stat-label">Cities<br />Explored</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">6</span>
+        <span class="stat-label">Continents<br />Touched</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">More<br />To Go</span>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div class="map-wrap">
+      <div id="map"></div>
+    </div>
+
+    <!-- City list by continent -->
+    <div class="city-section">
+      <div class="city-section-label">
+        Cities & Places
+        <div class="city-rule"></div>
+      </div>
+
+      <div class="continent-group">
+        <div class="continent-name">Europe</div>
+        <div class="city-grid">
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">St. Petersburg</span
+            ><span class="city-country">Russia</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Amsterdam</span
+            ><span class="city-country">Netherlands</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Vienna</span
+            ><span class="city-country">Austria</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Bratislava</span
+            ><span class="city-country">Slovakia</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Budapest</span
+            ><span class="city-country">Hungary</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Prague</span
+            ><span class="city-country">Czech Republic</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Cologne</span
+            ><span class="city-country">Germany</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Genoa</span
+            ><span class="city-country">Italy</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Rome</span
+            ><span class="city-country">Italy</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Barcelona</span
+            ><span class="city-country">Spain</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Paris</span
+            ><span class="city-country">France</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">London</span
+            ><span class="city-country">England</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Edinburgh</span
+            ><span class="city-country">Scotland</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="continent-group">
+        <div class="continent-name">Africa</div>
+        <div class="city-grid">
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Tanzania</span
+            ><span class="city-country">Tanzania</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Nairobi</span
+            ><span class="city-country">Kenya</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Zanzibar</span
+            ><span class="city-country">Tanzania</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="continent-group">
+        <div class="continent-name">Asia</div>
+        <div class="city-grid">
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Seoul</span
+            ><span class="city-country">South Korea</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Tokyo</span
+            ><span class="city-country">Japan</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="continent-group">
+        <div class="continent-name">South America</div>
+        <div class="city-grid">
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Buenos Aires</span
+            ><span class="city-country">Argentina</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Lima</span
+            ><span class="city-country">Peru</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="continent-group">
+        <div class="continent-name">North & Central America</div>
+        <div class="city-grid">
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Panama City</span
+            ><span class="city-country">Panama</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Mexico</span
+            ><span class="city-country">Mexico</span>
+          </div>
+          <div class="city-item">
+            <div class="city-dot"></div>
+            <span class="city-name">Canada</span
+            ><span class="city-country">Canada</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <span class="footer-name">Andrew Butler</span>
+      <span class="footer-copy">© 2026 · travel.andrewfbutler.com</span>
+    </footer>
+
+    <script>
+      // ─── Theme ───
+      const root = document.documentElement;
+      const themeToggle = document.getElementById("themeToggle");
+      const saved = localStorage.getItem("ab-theme") || "light";
+      root.setAttribute("data-theme", saved);
+
+      themeToggle.addEventListener("click", () => {
+        const next =
+          root.getAttribute("data-theme") === "light" ? "dark" : "light";
+        root.setAttribute("data-theme", next);
+        localStorage.setItem("ab-theme", next);
+        updateMapTheme(next);
+      });
+
+      // ─── City data ───
+      const cities = [
+        {
+          name: "St. Petersburg",
+          country: "Russia",
+          lat: 59.9343,
+          lng: 30.3351,
+        },
+        {
+          name: "Amsterdam",
+          country: "Netherlands",
+          lat: 52.3676,
+          lng: 4.9041,
+        },
+        { name: "Vienna", country: "Austria", lat: 48.2082, lng: 16.3738 },
+        { name: "Bratislava", country: "Slovakia", lat: 48.1486, lng: 17.1077 },
+        { name: "Budapest", country: "Hungary", lat: 47.4979, lng: 19.0402 },
+        {
+          name: "Prague",
+          country: "Czech Republic",
+          lat: 50.0755,
+          lng: 14.4378,
+        },
+        { name: "Cologne", country: "Germany", lat: 50.9333, lng: 6.95 },
+        { name: "Genoa", country: "Italy", lat: 44.4056, lng: 8.9463 },
+        { name: "Rome", country: "Italy", lat: 41.9028, lng: 12.4964 },
+        { name: "Barcelona", country: "Spain", lat: 41.3851, lng: 2.1734 },
+        { name: "Paris", country: "France", lat: 48.8566, lng: 2.3522 },
+        { name: "London", country: "England", lat: 51.5074, lng: -0.1278 },
+        { name: "Edinburgh", country: "Scotland", lat: 55.9533, lng: -3.1883 },
+        {
+          name: "Dar es Salaam",
+          country: "Tanzania",
+          lat: -6.7924,
+          lng: 39.2083,
+        },
+        { name: "Nairobi", country: "Kenya", lat: -1.2921, lng: 36.8219 },
+        { name: "Zanzibar", country: "Tanzania", lat: -6.1659, lng: 39.2026 },
+        { name: "Seoul", country: "South Korea", lat: 37.5665, lng: 126.978 },
+        { name: "Tokyo", country: "Japan", lat: 35.6762, lng: 139.6503 },
+        {
+          name: "Buenos Aires",
+          country: "Argentina",
+          lat: -34.6037,
+          lng: -58.3816,
+        },
+        { name: "Lima", country: "Peru", lat: -12.0464, lng: -77.0428 },
+        { name: "Panama City", country: "Panama", lat: 8.9936, lng: -79.5197 },
+        { name: "Mexico City", country: "Mexico", lat: 19.4326, lng: -99.1332 },
+        { name: "Vancouver", country: "Canada", lat: 49.2827, lng: -123.1207 },
+      ];
+
+      // ─── Map setup ───
+      const isDark = () => root.getAttribute("data-theme") === "dark";
+
+      const lightTile =
+        "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png";
+      const darkTile =
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png";
+      const tileAttrib =
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>';
+
+      const map = L.map("map", {
+        center: [30, 15],
+        zoom: 2,
+        minZoom: 2,
+        maxZoom: 10,
+        zoomControl: true,
+        scrollWheelZoom: true,
+      });
+
+      let tileLayer = L.tileLayer(isDark() ? darkTile : lightTile, {
+        attribution: tileAttrib,
+        subdomains: "abcd",
+        maxZoom: 20,
+      }).addTo(map);
+
+      // ─── Custom crimson pin icon ───
+      function makeIcon() {
+        return L.divIcon({
+          className: "",
+          html: `<div class="custom-pin" style="background:${isDark() ? "#c0392b" : "#9b1c1c"}"></div>`,
+          iconSize: [12, 12],
+          iconAnchor: [6, 6],
+          popupAnchor: [0, -10],
+        });
+      }
+
+      // ─── Add pins ───
+      cities.forEach((city) => {
+        const marker = L.marker([city.lat, city.lng], { icon: makeIcon() });
+        marker.bindPopup(
+          `
+          <div class="popup-city">${city.name}</div>
+          <div class="popup-country">${city.country}</div>
+        `,
+          { maxWidth: 160, className: "custom-popup" },
+        );
+        marker.addTo(map);
+      });
+
+      // ─── Theme swap ───
+      function updateMapTheme(theme) {
+        map.removeLayer(tileLayer);
+        tileLayer = L.tileLayer(theme === "dark" ? darkTile : lightTile, {
+          attribution: tileAttrib,
+          subdomains: "abcd",
+          maxZoom: 20,
+        }).addTo(map);
+
+        // Refresh all markers with correct color
+        map.eachLayer((layer) => {
+          if (layer instanceof L.Marker) {
+            layer.setIcon(makeIcon());
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
