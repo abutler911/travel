@@ -14,7 +14,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -23,6 +22,7 @@
     />
 
     <style>
+      /* ─── VARIABLES ─── */
       :root {
         --bg: #f7f4ef;
         --bg-card: #ffffff;
@@ -34,12 +34,13 @@
         --accent-dim: rgba(155, 28, 28, 0.08);
         --border: rgba(0, 0, 0, 0.08);
         --border-bright: rgba(0, 0, 0, 0.14);
-        --shadow: 0 2px 24px rgba(0, 0, 0, 0.07);
-        --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
+        --shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.1);
         --serif: "Cormorant Garamond", Georgia, serif;
         --mono: "JetBrains Mono", monospace;
         --pin-color: #9b1c1c;
-        --pin-pulse: rgba(155, 28, 28, 0.3);
+        --pin-pulse: rgba(155, 28, 28, 0.25);
+        --space: 1.25rem;
       }
 
       [data-theme="dark"] {
@@ -53,12 +54,13 @@
         --accent-dim: rgba(192, 57, 43, 0.1);
         --border: rgba(255, 255, 255, 0.07);
         --border-bright: rgba(255, 255, 255, 0.12);
-        --shadow: 0 2px 24px rgba(0, 0, 0, 0.4);
-        --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.5);
+        --shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
         --pin-color: #e05050;
-        --pin-pulse: rgba(224, 80, 80, 0.3);
+        --pin-pulse: rgba(224, 80, 80, 0.25);
       }
 
+      /* ─── RESET ─── */
       *,
       *::before,
       *::after {
@@ -72,6 +74,7 @@
         color: var(--text-primary);
         font-family: var(--serif);
         overflow-x: hidden;
+        -webkit-text-size-adjust: 100%;
         transition:
           background 0.4s,
           color 0.4s;
@@ -86,6 +89,7 @@
         color: #fff;
       }
 
+      /* Grain */
       body::after {
         content: "";
         position: fixed;
@@ -98,7 +102,7 @@
       }
 
       ::-webkit-scrollbar {
-        width: 4px;
+        width: 3px;
       }
       ::-webkit-scrollbar-track {
         background: var(--bg);
@@ -108,14 +112,15 @@
         border-radius: 2px;
       }
 
-      /* ─── NAV ─── */
+      /* ─── NAV — mobile first ─── */
       nav {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         z-index: 1000;
-        padding: 1.4rem 5vw;
+        height: 52px;
+        padding: 0 var(--space);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -127,66 +132,61 @@
       .nav-left {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 10px;
       }
 
       .nav-back {
         font-family: var(--mono);
-        font-size: 0.58rem;
-        letter-spacing: 0.14em;
+        font-size: 0.56rem;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--text-muted);
         text-decoration: none;
         display: flex;
         align-items: center;
-        gap: 8px;
-        transition: color 0.3s;
+        gap: 6px;
+        -webkit-tap-highlight-color: transparent;
+        transition: color 0.2s;
       }
-      .nav-back:hover {
+      .nav-back:hover,
+      .nav-back:active {
         color: var(--accent);
       }
 
       .nav-sep {
         width: 1px;
-        height: 14px;
+        height: 12px;
         background: var(--border-bright);
       }
 
       .nav-title {
         font-family: var(--serif);
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-style: italic;
-        font-weight: 400;
         color: var(--text-primary);
-        letter-spacing: 0.02em;
-      }
-
-      .nav-right {
-        display: flex;
-        align-items: center;
-        gap: 10px;
       }
 
       .theme-toggle {
         background: none;
         border: 1px solid var(--border-bright);
         border-radius: 4px;
-        width: 34px;
-        height: 30px;
+        width: 32px;
+        height: 28px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--text-secondary);
+        -webkit-tap-highlight-color: transparent;
         transition:
-          border-color 0.3s,
-          color 0.3s,
-          background 0.3s;
+          border-color 0.2s,
+          color 0.2s,
+          background 0.2s;
       }
-      .theme-toggle:hover {
+      .theme-toggle:active {
+        background: var(--accent-dim);
         border-color: var(--accent);
         color: var(--accent);
-        background: var(--accent-dim);
       }
 
       [data-theme="light"] .icon-moon {
@@ -202,40 +202,43 @@
         display: none;
       }
 
-      /* ─── HERO ─── */
+      /* ─── PAGE WRAPPER ─── */
+      .page {
+        padding-top: 52px;
+      }
+
+      /* ─── HERO — mobile first ─── */
       .hero {
-        padding: 7rem 5vw 3rem;
-        max-width: 1400px;
-        margin: 0 auto;
+        padding: 2rem var(--space) 1.5rem;
       }
 
       .hero-label {
         font-family: var(--mono);
-        font-size: 0.58rem;
-        letter-spacing: 0.2em;
+        font-size: 0.54rem;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
         color: var(--accent);
-        margin-bottom: 1.2rem;
+        margin-bottom: 0.8rem;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
       }
 
       .label-line {
-        display: inline-block;
-        width: 24px;
+        width: 20px;
         height: 1px;
         background: var(--accent);
+        flex-shrink: 0;
       }
 
       .hero-title {
         font-family: var(--serif);
-        font-size: clamp(3rem, 7vw, 6rem);
+        font-size: clamp(2.6rem, 10vw, 6rem);
         font-weight: 300;
         line-height: 0.95;
         letter-spacing: -0.02em;
         color: var(--text-primary);
-        margin-bottom: 1rem;
+        margin-bottom: 0.9rem;
       }
       .hero-title em {
         font-style: italic;
@@ -244,245 +247,91 @@
 
       .hero-sub {
         font-family: var(--serif);
-        font-size: 1.05rem;
+        font-size: 1rem;
         font-style: italic;
         font-weight: 300;
         color: var(--text-secondary);
-        max-width: 500px;
-        line-height: 1.7;
+        line-height: 1.65;
+        max-width: 480px;
       }
 
-      /* ─── STATS STRIP ─── */
+      /* ─── STATS STRIP — mobile first ─── */
       .stats-strip {
-        display: flex;
-        align-items: center;
-        padding: 2rem 5vw;
-        max-width: 1400px;
-        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        padding: 0 var(--space);
         border-top: 1px solid var(--border);
         border-bottom: 1px solid var(--border);
-        flex-wrap: wrap;
-        gap: 0;
+        margin: 1.5rem 0;
       }
 
       .stat-item {
-        display: flex;
-        align-items: baseline;
-        gap: 10px;
-        flex: 1;
-        min-width: 140px;
-        padding: 0.5rem 2rem 0.5rem 0;
+        padding: 1rem 0.75rem;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+
+      /* Remove right border from every 2nd child, bottom border from last 2 */
+      .stat-item:nth-child(2n) {
+        border-right: none;
+      }
+      .stat-item:nth-last-child(-n + 2) {
+        border-bottom: none;
       }
 
       .stat-num {
         font-family: var(--serif);
-        font-size: 2.8rem;
+        font-size: 2.4rem;
         font-weight: 300;
         color: var(--accent);
         line-height: 1;
         letter-spacing: -0.02em;
+        display: block;
+        margin-bottom: 4px;
       }
 
       .stat-label {
         font-family: var(--mono);
-        font-size: 0.52rem;
-        letter-spacing: 0.14em;
+        font-size: 0.5rem;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--text-muted);
-        line-height: 1.4;
+        line-height: 1.5;
+        display: block;
       }
 
-      .stat-divider {
-        width: 1px;
-        height: 32px;
-        background: var(--border-bright);
-        flex-shrink: 0;
-        margin-right: 2rem;
-      }
-
-      /* ─── MAP ─── */
+      /* ─── MAP — mobile first ─── */
       .map-wrap {
-        padding: 2rem 5vw 3rem;
-        max-width: 1400px;
-        margin: 0 auto;
+        padding: 0 var(--space) 1.5rem;
       }
 
       #map {
         width: 100%;
-        height: 65vh;
-        min-height: 440px;
-        border-radius: 10px;
+        height: 55vw;
+        min-height: 280px;
+        max-height: 420px;
+        border-radius: 8px;
         border: 1px solid var(--border);
         overflow: hidden;
-        box-shadow:
-          0 4px 40px rgba(0, 0, 0, 0.1),
-          0 1px 8px rgba(0, 0, 0, 0.06);
+        box-shadow: var(--shadow);
       }
 
-      /* ─── CUSTOM PIN ─── */
-      .pin-wrap {
-        position: relative;
-        width: 28px;
-        height: 36px;
-        cursor: pointer;
-      }
-
-      .pin-pulse {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -60%);
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: var(--pin-pulse, rgba(155, 28, 28, 0.3));
-        animation: pinPulse 2.5s ease-out infinite;
-        pointer-events: none;
-      }
-
-      .pin-svg {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-
-      .pin-wrap:hover .pin-svg {
-        transform: translateX(-50%) scale(1.25) translateY(-3px);
-      }
-
-      .pin-wrap:hover .pin-pulse {
-        animation: none;
-        opacity: 0.5;
-      }
-
-      @keyframes pinPulse {
-        0% {
-          transform: translate(-50%, -60%) scale(0.5);
-          opacity: 0.8;
-        }
-        70% {
-          transform: translate(-50%, -60%) scale(2);
-          opacity: 0;
-        }
-        100% {
-          transform: translate(-50%, -60%) scale(0.5);
-          opacity: 0;
-        }
-      }
-
-      @keyframes pinDrop {
-        0% {
-          transform: translateY(-40px) scale(0.5);
-          opacity: 0;
-        }
-        60% {
-          transform: translateY(4px) scale(1.05);
-          opacity: 1;
-        }
-        80% {
-          transform: translateY(-3px) scale(0.98);
-        }
-        100% {
-          transform: translateY(0) scale(1);
-          opacity: 1;
-        }
-      }
-
-      .pin-animate {
-        animation: pinDrop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-      }
-
-      /* ─── LEAFLET OVERRIDES ─── */
-      .leaflet-container {
-        font-family: var(--serif);
-      }
-
-      .leaflet-popup-content-wrapper {
-        background: var(--bg-card) !important;
-        border: none !important;
-        border-radius: 8px !important;
-        box-shadow:
-          0 12px 40px rgba(0, 0, 0, 0.15),
-          0 2px 8px rgba(0, 0, 0, 0.08) !important;
-        padding: 0 !important;
-        overflow: hidden;
-      }
-
-      .leaflet-popup-content {
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      .leaflet-popup-tip-container {
-        margin-top: -1px;
-      }
-
-      .leaflet-popup-tip {
-        background: var(--bg-card) !important;
-        box-shadow: none !important;
-      }
-
-      .leaflet-popup-close-button {
-        color: var(--text-muted) !important;
-        font-size: 18px !important;
-        padding: 6px 8px !important;
-        top: 4px !important;
-        right: 4px !important;
-        z-index: 10;
-      }
-
-      .popup-inner {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .popup-accent-bar {
-        height: 3px;
-        background: var(--accent);
-        width: 100%;
-      }
-
-      .popup-body {
-        padding: 12px 16px 14px;
-      }
-
-      .popup-city {
-        font-family: var(--serif);
-        font-size: 1.15rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        line-height: 1.2;
-        margin-bottom: 3px;
-      }
-
-      .popup-country {
-        font-family: var(--mono);
-        font-size: 0.5rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-      }
-
-      /* ─── CITY LIST ─── */
+      /* ─── CITY LIST — mobile first ─── */
       .city-section {
-        padding: 3rem 5vw 4rem;
-        max-width: 1400px;
-        margin: 0 auto;
+        padding: 0 var(--space) 3rem;
       }
 
       .city-section-label {
         font-family: var(--mono);
-        font-size: 0.56rem;
-        letter-spacing: 0.2em;
+        font-size: 0.54rem;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
         color: var(--accent);
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
       }
 
       .city-rule {
@@ -496,47 +345,49 @@
       }
 
       .continent-group {
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
       }
 
       .continent-name {
         font-family: var(--mono);
-        font-size: 0.52rem;
-        letter-spacing: 0.18em;
+        font-size: 0.5rem;
+        letter-spacing: 0.16em;
         text-transform: uppercase;
         color: var(--text-muted);
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
         padding-bottom: 0.5rem;
         border-bottom: 1px solid var(--border);
       }
 
+      /* 2 columns on mobile */
       .city-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 8px;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
       }
 
       .city-item {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 12px;
+        gap: 8px;
+        padding: 7px 10px;
         border-radius: 4px;
         border: 1px solid var(--border);
         background: var(--bg-card);
         transition:
-          border-color 0.25s,
-          background 0.25s;
-        cursor: default;
+          border-color 0.2s,
+          background 0.2s;
+        -webkit-tap-highlight-color: transparent;
+        min-width: 0;
       }
-      .city-item:hover {
+      .city-item:active {
         border-color: var(--accent);
         background: var(--accent-dim);
       }
 
       .city-dot {
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
         background: var(--accent);
         flex-shrink: 0;
@@ -544,30 +395,33 @@
 
       .city-name {
         font-family: var(--serif);
-        font-size: 0.92rem;
+        font-size: 0.88rem;
         font-weight: 400;
         color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
       }
 
       .city-country {
         font-family: var(--mono);
-        font-size: 0.48rem;
-        letter-spacing: 0.08em;
+        font-size: 0.44rem;
+        letter-spacing: 0.06em;
         color: var(--text-muted);
         margin-left: auto;
+        white-space: nowrap;
+        flex-shrink: 0;
+        display: none; /* hidden on mobile to save space */
       }
 
-      /* ─── FOOTER ─── */
+      /* ─── FOOTER — mobile first ─── */
       footer {
         border-top: 1px solid var(--border);
-        padding: 2.5rem 5vw;
+        padding: 1.5rem var(--space);
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        max-width: 1400px;
-        margin: 0 auto;
+        flex-direction: column;
+        gap: 6px;
       }
 
       .footer-name {
@@ -576,30 +430,265 @@
         font-style: italic;
         color: var(--text-primary);
       }
+
       .footer-copy {
         font-family: var(--mono);
-        font-size: 0.5rem;
+        font-size: 0.48rem;
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--text-muted);
       }
 
-      @media (max-width: 768px) {
-        .hero {
-          padding: 6rem 5vw 2rem;
+      /* ─── PIN STYLES ─── */
+      .pin-wrap {
+        position: relative;
+        width: 24px;
+        height: 32px;
+        cursor: pointer;
+      }
+
+      .pin-pulse {
+        position: absolute;
+        top: 35%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--pin-pulse);
+        animation: pinPulse 2.5s ease-out infinite;
+        pointer-events: none;
+      }
+
+      .pin-svg {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.25));
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .pin-wrap:hover .pin-svg {
+        transform: translateX(-50%) scale(1.2) translateY(-2px);
+      }
+
+      .pin-wrap:hover .pin-pulse {
+        animation: none;
+        opacity: 0.4;
+      }
+
+      @keyframes pinPulse {
+        0% {
+          transform: translate(-50%, -50%) scale(0.4);
+          opacity: 0.8;
         }
+        70% {
+          transform: translate(-50%, -50%) scale(2.2);
+          opacity: 0;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(0.4);
+          opacity: 0;
+        }
+      }
+
+      @keyframes pinDrop {
+        0% {
+          transform: translateY(-32px) scale(0.5);
+          opacity: 0;
+        }
+        60% {
+          transform: translateY(3px) scale(1.04);
+          opacity: 1;
+        }
+        80% {
+          transform: translateY(-2px) scale(0.98);
+        }
+        100% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .pin-animate {
+        animation: pinDrop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      }
+
+      /* ─── LEAFLET OVERRIDES ─── */
+      .leaflet-container {
+        font-family: var(--serif);
+      }
+
+      .leaflet-popup-content-wrapper {
+        background: var(--bg-card) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        box-shadow:
+          0 10px 36px rgba(0, 0, 0, 0.14),
+          0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        padding: 0 !important;
+        overflow: hidden;
+      }
+
+      .leaflet-popup-content {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .leaflet-popup-tip {
+        background: var(--bg-card) !important;
+        box-shadow: none !important;
+      }
+      .leaflet-popup-tip-container {
+        margin-top: -1px;
+      }
+
+      .leaflet-popup-close-button {
+        color: var(--text-muted) !important;
+        font-size: 16px !important;
+        padding: 5px 7px !important;
+        top: 3px !important;
+        right: 3px !important;
+        z-index: 10;
+      }
+
+      .popup-inner {
+        display: flex;
+        flex-direction: column;
+      }
+      .popup-accent-bar {
+        height: 3px;
+        background: var(--accent);
+      }
+      .popup-body {
+        padding: 10px 14px 12px;
+      }
+
+      .popup-city {
+        font-family: var(--serif);
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.2;
+        margin-bottom: 2px;
+      }
+
+      .popup-country {
+        font-family: var(--mono);
+        font-size: 0.48rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      /* ─── TABLET ─── */
+      @media (min-width: 540px) {
+        :root {
+          --space: 1.75rem;
+        }
+
+        .city-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .city-country {
+          display: block;
+        }
+
         #map {
-          height: 50vh;
+          height: 45vw;
+          max-height: 500px;
         }
-        .stat-divider {
-          display: none;
+      }
+
+      /* ─── DESKTOP ─── */
+      @media (min-width: 900px) {
+        :root {
+          --space: 5vw;
         }
+
+        .hero {
+          padding: 3.5rem var(--space) 2.5rem;
+        }
+
         .stats-strip {
-          gap: 1rem;
+          display: flex;
+          grid-template-columns: unset;
+          padding: 1.5rem var(--space);
+          margin: 2rem 0;
+          max-width: 1400px;
+          margin-left: auto;
+          margin-right: auto;
         }
+
+        .stat-item {
+          flex: 1;
+          padding: 0.5rem 2rem 0.5rem 0;
+          border-right: none;
+          border-bottom: none;
+        }
+
+        .stat-item:not(:last-child) {
+          border-right: 1px solid var(--border-bright);
+          padding-right: 2rem;
+          margin-right: 2rem;
+        }
+
+        .stat-num {
+          font-size: 2.8rem;
+        }
+
+        .map-wrap {
+          padding: 0 var(--space) 2.5rem;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        #map {
+          height: 60vh;
+          max-height: 700px;
+          box-shadow:
+            0 4px 40px rgba(0, 0, 0, 0.1),
+            0 1px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .city-section {
+          padding: 0 var(--space) 4rem;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        .city-grid {
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 8px;
+        }
+        .city-name {
+          font-size: 0.92rem;
+        }
+        .city-country {
+          display: block;
+          font-size: 0.48rem;
+        }
+        .city-item {
+          padding: 8px 12px;
+        }
+        .city-item:hover {
+          border-color: var(--accent);
+          background: var(--accent-dim);
+        }
+
         footer {
-          flex-direction: column;
-          align-items: flex-start;
+          padding: 2rem var(--space);
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        .hero {
+          max-width: 1400px;
+          margin-left: auto;
+          margin-right: auto;
         }
       }
     </style>
@@ -609,12 +698,12 @@
       <div class="nav-left">
         <a href="https://andrewfbutler.com" class="nav-back">
           <svg
-            width="12"
-            height="12"
+            width="11"
+            height="11"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="2.5"
             stroke-linecap="round"
             stroke-linejoin="round"
           >
@@ -625,331 +714,89 @@
         <div class="nav-sep"></div>
         <span class="nav-title">Travels</span>
       </div>
-      <div class="nav-right">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-          <svg
-            class="icon-sun"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="4" />
-            <path
-              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
-            />
-          </svg>
-          <svg
-            class="icon-moon"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-          </svg>
-        </button>
-      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg
+          class="icon-sun"
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+          />
+        </svg>
+        <svg
+          class="icon-moon"
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+        </svg>
+      </button>
     </nav>
 
-    <div class="hero">
-      <div class="hero-label">
-        <span class="label-line"></span>
-        Andrew Butler
+    <div class="page">
+      <div class="hero">
+        <div class="hero-label">
+          <span class="label-line"></span>Andrew Butler
+        </div>
+        <h1 class="hero-title">Places We've<br /><em>Been.</em></h1>
+        <p class="hero-sub">
+          A life lived in motion. From East Africa to East Asia, South America
+          to Eastern Europe — collected over a lifetime of wandering with
+          intent. Experiences over possessions. Always.
+        </p>
       </div>
-      <h1 class="hero-title">Places We've<br /><em>Been.</em></h1>
-      <p class="hero-sub">
-        A life lived in motion. From East Africa to East Asia, South America to
-        Eastern Europe — collected over a lifetime of wandering with intent.
-        Experiences over possessions. Always.
-      </p>
+
+      <div class="stats-strip">
+        <div class="stat-item">
+          <span class="stat-num" id="stat-countries">—</span
+          ><span class="stat-label">Countries Visited</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="stat-cities">—</span
+          ><span class="stat-label">Cities Explored</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="stat-continents">—</span
+          ><span class="stat-label">Continents Touched</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">∞</span
+          ><span class="stat-label">More To Go</span>
+        </div>
+      </div>
+
+      <div class="map-wrap">
+        <div id="map"></div>
+      </div>
+
+      <div class="city-section">
+        <div class="city-section-label">
+          Cities & Places
+          <div class="city-rule"></div>
+        </div>
+        <div id="city-groups"></div>
+      </div>
+
+      <footer>
+        <span class="footer-name">Andrew Butler</span>
+        <span class="footer-copy">© 2026 · travel.andrewfbutler.com</span>
+      </footer>
     </div>
-
-    <div class="stats-strip">
-      <div class="stat-item">
-        <span class="stat-num">29</span>
-        <span class="stat-label">Countries<br />Visited</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">42</span>
-        <span class="stat-label">Cities<br />Explored</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">6</span>
-        <span class="stat-label">Continents<br />Touched</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">∞</span>
-        <span class="stat-label">More<br />To Go</span>
-      </div>
-    </div>
-
-    <div class="map-wrap">
-      <div id="map"></div>
-    </div>
-
-    <div class="city-section">
-      <div class="city-section-label">
-        Cities & Places
-        <div class="city-rule"></div>
-      </div>
-
-      <div class="continent-group">
-        <div class="continent-name">Europe</div>
-        <div class="city-grid">
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">St. Petersburg</span
-            ><span class="city-country">Russia</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Copenhagen</span
-            ><span class="city-country">Denmark</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Amsterdam</span
-            ><span class="city-country">Netherlands</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Vienna</span
-            ><span class="city-country">Austria</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Bratislava</span
-            ><span class="city-country">Slovakia</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Budapest</span
-            ><span class="city-country">Hungary</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Prague</span
-            ><span class="city-country">Czech Republic</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Cologne</span
-            ><span class="city-country">Germany</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Genoa</span
-            ><span class="city-country">Italy</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Rome</span
-            ><span class="city-country">Italy</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Barcelona</span
-            ><span class="city-country">Spain</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Paris</span
-            ><span class="city-country">France</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Cannes</span
-            ><span class="city-country">France</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Florence</span
-            ><span class="city-country">Italy</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">London</span
-            ><span class="city-country">England</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Edinburgh</span
-            ><span class="city-country">Scotland</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Istanbul</span
-            ><span class="city-country">Türkiye</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="continent-group">
-        <div class="continent-name">Africa</div>
-        <div class="city-grid">
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Dar es Salaam</span
-            ><span class="city-country">Tanzania</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Nairobi</span
-            ><span class="city-country">Kenya</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Zanzibar</span
-            ><span class="city-country">Tanzania</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="continent-group">
-        <div class="continent-name">Asia</div>
-        <div class="city-grid">
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Seoul</span
-            ><span class="city-country">South Korea</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Tokyo</span
-            ><span class="city-country">Japan</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="continent-group">
-        <div class="continent-name">South America</div>
-        <div class="city-grid">
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Buenos Aires</span
-            ><span class="city-country">Argentina</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Lima</span
-            ><span class="city-country">Peru</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="continent-group">
-        <div class="continent-name">North & Central America · Caribbean</div>
-        <div class="city-grid">
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Panama City</span
-            ><span class="city-country">Panama</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Belize City</span
-            ><span class="city-country">Belize</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Roatán</span
-            ><span class="city-country">Honduras</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Santo Domingo</span
-            ><span class="city-country">Dominican Republic</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Nassau</span
-            ><span class="city-country">Bahamas</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">George Town</span
-            ><span class="city-country">Grand Cayman</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Monterrey</span
-            ><span class="city-country">Mexico</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Guanajuato</span
-            ><span class="city-country">Mexico</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Ciudad Juárez</span
-            ><span class="city-country">Mexico</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Tijuana</span
-            ><span class="city-country">Mexico</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Cabo San Lucas</span
-            ><span class="city-country">Mexico</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Mazatlán</span
-            ><span class="city-country">Mexico</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Puerto Vallarta</span
-            ><span class="city-country">Mexico</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Cozumel</span
-            ><span class="city-country">Mexico</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Vancouver</span
-            ><span class="city-country">Canada</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Toronto</span
-            ><span class="city-country">Canada</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Regina</span
-            ><span class="city-country">Canada</span>
-          </div>
-          <div class="city-item">
-            <div class="city-dot"></div>
-            <span class="city-name">Edmonton</span
-            ><span class="city-country">Canada</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <footer>
-      <span class="footer-name">Andrew Butler</span>
-      <span class="footer-copy">© 2026 · travel.andrewfbutler.com</span>
-    </footer>
+    <!-- .page -->
 
     <script>
       // ─── Theme ───
@@ -966,106 +813,366 @@
         updateMapTheme(next);
       });
 
-      // ─── City data ───
+      // ─── Cities ───
       const cities = [
         {
           name: "St. Petersburg",
           country: "Russia",
+          continent: "Europe",
           lat: 59.9343,
           lng: 30.3351,
         },
-        { name: "Copenhagen", country: "Denmark", lat: 55.6761, lng: 12.5683 },
+        {
+          name: "Copenhagen",
+          country: "Denmark",
+          continent: "Europe",
+          lat: 55.6761,
+          lng: 12.5683,
+        },
         {
           name: "Amsterdam",
           country: "Netherlands",
+          continent: "Europe",
           lat: 52.3676,
           lng: 4.9041,
         },
-        { name: "Vienna", country: "Austria", lat: 48.2082, lng: 16.3738 },
-        { name: "Bratislava", country: "Slovakia", lat: 48.1486, lng: 17.1077 },
-        { name: "Budapest", country: "Hungary", lat: 47.4979, lng: 19.0402 },
+        {
+          name: "Vienna",
+          country: "Austria",
+          continent: "Europe",
+          lat: 48.2082,
+          lng: 16.3738,
+        },
+        {
+          name: "Bratislava",
+          country: "Slovakia",
+          continent: "Europe",
+          lat: 48.1486,
+          lng: 17.1077,
+        },
+        {
+          name: "Budapest",
+          country: "Hungary",
+          continent: "Europe",
+          lat: 47.4979,
+          lng: 19.0402,
+        },
         {
           name: "Prague",
           country: "Czech Republic",
+          continent: "Europe",
           lat: 50.0755,
           lng: 14.4378,
         },
-        { name: "Cannes", country: "France", lat: 43.5528, lng: 7.0174 },
-        { name: "Florence", country: "Italy", lat: 43.7696, lng: 11.2558 },
-        { name: "Cologne", country: "Germany", lat: 50.9333, lng: 6.95 },
-        { name: "Genoa", country: "Italy", lat: 44.4056, lng: 8.9463 },
-        { name: "Rome", country: "Italy", lat: 41.9028, lng: 12.4964 },
-        { name: "Barcelona", country: "Spain", lat: 41.3851, lng: 2.1734 },
-        { name: "Paris", country: "France", lat: 48.8566, lng: 2.3522 },
-        { name: "London", country: "England", lat: 51.5074, lng: -0.1278 },
-        { name: "Edinburgh", country: "Scotland", lat: 55.9533, lng: -3.1883 },
-        { name: "Istanbul", country: "Türkiye", lat: 41.0082, lng: 28.9784 },
+        {
+          name: "Cologne",
+          country: "Germany",
+          continent: "Europe",
+          lat: 50.9333,
+          lng: 6.95,
+        },
+        {
+          name: "Florence",
+          country: "Italy",
+          continent: "Europe",
+          lat: 43.7696,
+          lng: 11.2558,
+        },
+        {
+          name: "Genoa",
+          country: "Italy",
+          continent: "Europe",
+          lat: 44.4056,
+          lng: 8.9463,
+        },
+        {
+          name: "Rome",
+          country: "Italy",
+          continent: "Europe",
+          lat: 41.9028,
+          lng: 12.4964,
+        },
+        {
+          name: "Barcelona",
+          country: "Spain",
+          continent: "Europe",
+          lat: 41.3851,
+          lng: 2.1734,
+        },
+        {
+          name: "Cannes",
+          country: "France",
+          continent: "Europe",
+          lat: 43.5528,
+          lng: 7.0174,
+        },
+        {
+          name: "Paris",
+          country: "France",
+          continent: "Europe",
+          lat: 48.8566,
+          lng: 2.3522,
+        },
+        {
+          name: "London",
+          country: "England",
+          continent: "Europe",
+          lat: 51.5074,
+          lng: -0.1278,
+        },
+        {
+          name: "Edinburgh",
+          country: "Scotland",
+          continent: "Europe",
+          lat: 55.9533,
+          lng: -3.1883,
+        },
+        {
+          name: "Istanbul",
+          country: "Türkiye",
+          continent: "Europe",
+          lat: 41.0082,
+          lng: 28.9784,
+        },
         {
           name: "Dar es Salaam",
           country: "Tanzania",
+          continent: "Africa",
           lat: -6.7924,
           lng: 39.2083,
         },
-        { name: "Nairobi", country: "Kenya", lat: -1.2921, lng: 36.8219 },
-        { name: "Zanzibar", country: "Tanzania", lat: -6.1659, lng: 39.2026 },
-        { name: "Seoul", country: "South Korea", lat: 37.5665, lng: 126.978 },
-        { name: "Tokyo", country: "Japan", lat: 35.6762, lng: 139.6503 },
+        {
+          name: "Nairobi",
+          country: "Kenya",
+          continent: "Africa",
+          lat: -1.2921,
+          lng: 36.8219,
+        },
+        {
+          name: "Zanzibar",
+          country: "Tanzania",
+          continent: "Africa",
+          lat: -6.1659,
+          lng: 39.2026,
+        },
+        {
+          name: "Seoul",
+          country: "South Korea",
+          continent: "Asia",
+          lat: 37.5665,
+          lng: 126.978,
+        },
+        {
+          name: "Tokyo",
+          country: "Japan",
+          continent: "Asia",
+          lat: 35.6762,
+          lng: 139.6503,
+        },
         {
           name: "Buenos Aires",
           country: "Argentina",
+          continent: "South America",
           lat: -34.6037,
           lng: -58.3816,
         },
-        { name: "Lima", country: "Peru", lat: -12.0464, lng: -77.0428 },
-        { name: "Panama City", country: "Panama", lat: 8.9936, lng: -79.5197 },
-        { name: "Belize City", country: "Belize", lat: 17.251, lng: -88.759 },
-        { name: "Roatán", country: "Honduras", lat: 16.323, lng: -86.535 },
+        {
+          name: "Lima",
+          country: "Peru",
+          continent: "South America",
+          lat: -12.0464,
+          lng: -77.0428,
+        },
+        {
+          name: "Panama City",
+          country: "Panama",
+          continent: "Americas",
+          lat: 8.9936,
+          lng: -79.5197,
+        },
+        {
+          name: "Belize City",
+          country: "Belize",
+          continent: "Americas",
+          lat: 17.251,
+          lng: -88.759,
+        },
+        {
+          name: "Roatán",
+          country: "Honduras",
+          continent: "Americas",
+          lat: 16.323,
+          lng: -86.535,
+        },
         {
           name: "Santo Domingo",
           country: "Dominican Republic",
+          continent: "Americas",
           lat: 18.4861,
           lng: -69.9312,
         },
-        { name: "Nassau", country: "Bahamas", lat: 25.048, lng: -77.3554 },
+        {
+          name: "Nassau",
+          country: "Bahamas",
+          continent: "Americas",
+          lat: 25.048,
+          lng: -77.3554,
+        },
         {
           name: "George Town",
           country: "Grand Cayman",
+          continent: "Americas",
           lat: 19.2869,
           lng: -81.3674,
-        },
-        { name: "Monterrey", country: "Mexico", lat: 25.6866, lng: -100.3161 },
-        { name: "Guanajuato", country: "Mexico", lat: 21.019, lng: -101.2574 },
-        {
-          name: "Ciudad Juárez",
-          country: "Mexico",
-          lat: 31.7381,
-          lng: -106.487,
         },
         {
           name: "Cabo San Lucas",
           country: "Mexico",
+          continent: "Americas",
           lat: 22.8905,
           lng: -109.9167,
         },
-        { name: "Mazatlán", country: "Mexico", lat: 23.2494, lng: -106.4111 },
+        {
+          name: "Mazatlán",
+          country: "Mexico",
+          continent: "Americas",
+          lat: 23.2494,
+          lng: -106.4111,
+        },
         {
           name: "Puerto Vallarta",
           country: "Mexico",
+          continent: "Americas",
           lat: 20.6534,
           lng: -105.2253,
         },
-        { name: "Cozumel", country: "Mexico", lat: 20.423, lng: -86.9223 },
-        { name: "Tijuana", country: "Mexico", lat: 32.5149, lng: -117.0382 },
-        { name: "Vancouver", country: "Canada", lat: 49.2827, lng: -123.1207 },
-        { name: "Toronto", country: "Canada", lat: 43.6532, lng: -79.3832 },
-        { name: "Regina", country: "Canada", lat: 50.4452, lng: -104.6189 },
-        { name: "Edmonton", country: "Canada", lat: 53.5461, lng: -113.4938 },
+        {
+          name: "Cozumel",
+          country: "Mexico",
+          continent: "Americas",
+          lat: 20.423,
+          lng: -86.9223,
+        },
+        {
+          name: "Monterrey",
+          country: "Mexico",
+          continent: "Americas",
+          lat: 25.6866,
+          lng: -100.3161,
+        },
+        {
+          name: "Guanajuato",
+          country: "Mexico",
+          continent: "Americas",
+          lat: 21.019,
+          lng: -101.2574,
+        },
+        {
+          name: "Ciudad Juárez",
+          country: "Mexico",
+          continent: "Americas",
+          lat: 31.7381,
+          lng: -106.487,
+        },
+        {
+          name: "Tijuana",
+          country: "Mexico",
+          continent: "Americas",
+          lat: 32.5149,
+          lng: -117.0382,
+        },
+        {
+          name: "Vancouver",
+          country: "Canada",
+          continent: "Americas",
+          lat: 49.2827,
+          lng: -123.1207,
+        },
+        {
+          name: "Toronto",
+          country: "Canada",
+          continent: "Americas",
+          lat: 43.6532,
+          lng: -79.3832,
+        },
+        {
+          name: "Regina",
+          country: "Canada",
+          continent: "Americas",
+          lat: 50.4452,
+          lng: -104.6189,
+        },
+        {
+          name: "Edmonton",
+          country: "Canada",
+          continent: "Americas",
+          lat: 53.5461,
+          lng: -113.4938,
+        },
       ];
 
-      // ─── Map tiles ───
-      const isDark = () => root.getAttribute("data-theme") === "dark";
+      // ─── Compute stats from data ───
+      const uniqueCountries = new Set(cities.map((c) => c.country)).size;
+      const uniqueCities = cities.length;
+      const uniqueContinents = new Set(cities.map((c) => c.continent)).size;
 
-      // Voyager (warm, detailed, beautiful) for light — dark nolabels for dark
+      document.getElementById("stat-countries").textContent = uniqueCountries;
+      document.getElementById("stat-cities").textContent = uniqueCities;
+      document.getElementById("stat-continents").textContent = uniqueContinents;
+
+      // ─── Build city list dynamically, sorted alphabetically ───
+      const continentOrder = [
+        "Europe",
+        "Africa",
+        "Asia",
+        "South America",
+        "Americas",
+      ];
+      const continentLabels = {
+        Europe: "Europe",
+        Africa: "Africa",
+        Asia: "Asia",
+        "South America": "South America",
+        Americas: "North & Central America · Caribbean",
+      };
+
+      const grouped = {};
+      continentOrder.forEach((c) => (grouped[c] = []));
+      cities.forEach((city) => {
+        if (grouped[city.continent]) grouped[city.continent].push(city);
+      });
+
+      const citySection = document.getElementById("city-groups");
+      continentOrder.forEach((continent) => {
+        const group = grouped[continent];
+        if (!group.length) return;
+
+        // Sort alphabetically by city name
+        group.sort((a, b) => a.name.localeCompare(b.name));
+
+        const div = document.createElement("div");
+        div.className = "continent-group";
+        div.innerHTML = `
+    <div class="continent-name">${continentLabels[continent]}</div>
+    <div class="city-grid">
+      ${group
+        .map(
+          (city) => `
+        <div class="city-item">
+          <div class="city-dot"></div>
+          <span class="city-name">${city.name}</span>
+          <span class="city-country">${city.country}</span>
+        </div>
+      `,
+        )
+        .join("")}
+    </div>
+  `;
+        citySection.appendChild(div);
+      });
+
+      // ─── Map ───
+      const isDark = () => root.getAttribute("data-theme") === "dark";
       const lightTile =
         "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png";
       const darkTile =
@@ -1079,7 +1186,8 @@
         minZoom: 2,
         maxZoom: 12,
         zoomControl: true,
-        scrollWheelZoom: true,
+        scrollWheelZoom: false,
+        tap: true,
       });
 
       let tileLayer = L.tileLayer(isDark() ? darkTile : lightTile, {
@@ -1088,54 +1196,47 @@
         maxZoom: 20,
       }).addTo(map);
 
-      // ─── Custom teardrop SVG pin ───
       function makePinSVG(color) {
-        return `
-          <svg width="20" height="28" viewBox="0 0 20 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="pin-svg">
-            <path d="M10 0C4.477 0 0 4.477 0 10c0 7.5 10 18 10 18s10-10.5 10-18C20 4.477 15.523 0 10 0z" fill="${color}"/>
-            <circle cx="10" cy="10" r="4" fill="white" opacity="0.9"/>
-          </svg>
-        `;
+        return `<svg width="18" height="26" viewBox="0 0 20 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="pin-svg">
+    <path d="M10 0C4.477 0 0 4.477 0 10c0 7.5 10 18 10 18s10-10.5 10-18C20 4.477 15.523 0 10 0z" fill="${color}"/>
+    <circle cx="10" cy="10" r="4" fill="white" opacity="0.9"/>
+  </svg>`;
       }
 
       function makeIcon(index) {
         const color = isDark() ? "#e05050" : "#9b1c1c";
-        const delay = index * 40 + "ms";
+        const delay = index * 35 + "ms";
         return L.divIcon({
           className: "",
-          html: `
-            <div class="pin-wrap pin-animate" style="animation-delay:${delay}">
-              <div class="pin-pulse"></div>
-              ${makePinSVG(color)}
-            </div>
-          `,
-          iconSize: [28, 36],
-          iconAnchor: [14, 36],
-          popupAnchor: [0, -38],
+          html: `<div class="pin-wrap pin-animate" style="animation-delay:${delay}">
+      <div class="pin-pulse"></div>
+      ${makePinSVG(color)}
+    </div>`,
+          iconSize: [24, 32],
+          iconAnchor: [12, 32],
+          popupAnchor: [0, -34],
         });
       }
 
-      // ─── Add markers ───
       const markers = [];
       cities.forEach((city, i) => {
         const marker = L.marker([city.lat, city.lng], { icon: makeIcon(i) });
         marker.bindPopup(
           `
-          <div class="popup-inner">
-            <div class="popup-accent-bar"></div>
-            <div class="popup-body">
-              <div class="popup-city">${city.name}</div>
-              <div class="popup-country">${city.country}</div>
-            </div>
-          </div>
-        `,
-          { maxWidth: 180, minWidth: 140 },
+    <div class="popup-inner">
+      <div class="popup-accent-bar"></div>
+      <div class="popup-body">
+        <div class="popup-city">${city.name}</div>
+        <div class="popup-country">${city.country}</div>
+      </div>
+    </div>
+  `,
+          { maxWidth: 170, minWidth: 130 },
         );
         marker.addTo(map);
         markers.push(marker);
       });
 
-      // ─── Theme swap ───
       function updateMapTheme(theme) {
         map.removeLayer(tileLayer);
         tileLayer = L.tileLayer(theme === "dark" ? darkTile : lightTile, {
@@ -1143,11 +1244,7 @@
           subdomains: "abcd",
           maxZoom: 20,
         }).addTo(map);
-
-        // Refresh markers with new color
-        markers.forEach((marker, i) => {
-          marker.setIcon(makeIcon(i));
-        });
+        markers.forEach((m, i) => m.setIcon(makeIcon(i)));
       }
     </script>
   </body>
